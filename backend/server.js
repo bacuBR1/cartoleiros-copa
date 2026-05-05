@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const server = express();
 const Cadastro = require("./models/cadastro");
 const Adm = require("./models/Adm");
@@ -13,20 +14,21 @@ Ranking.belongsTo(Cadastro, { foreignKey: "usuario_id" });
 Palpites.belongsTo(Jogo, { foreignKey: "jogo_id" });
 
 server.use(express.json());
+server.use(cors());
 
 /* -------------------------------função para gerar id------------------------------- */
 async function gerarId() {
     while (true) {
         var id = Math.floor(Math.random() * 900) + 100;
-        
+
         const existeCadastro = await Cadastro.findOne({ where: { id: id } }); //ta sendo uma luta existir um id que não existe, mas eu vou conseguir,
-                                                                              //  eu acredito em mim, eu sou capaz, eu sou forte, eu sou inteligente, eu sou o melhor,
-                                                                              //  eu sou o mais lindo,
-                                                                              //  eu sou o mais gostoso, eu sou o mais perfeito, eu sou o mais maravilhoso,
-                                                                              //  eu sou o mais incrível,
-                                                                              //  eu sou o mais sensacional, eu sou o mais extraordinário, eu sou o mais espetacular, eu sou o mais fenomenal,
-                                                                              //  eu sou o mais fantástico, eu sou o mais maravilhoso, eu sou o mais incrível, eu sou o mais sensacional,
-                                                                              //  eu sou o mais extraordinário, eu sou o mais espetacular, eu sou o mais fenomenal, eu sou o mais fantástico
+        //  eu acredito em mim, eu sou capaz, eu sou forte, eu sou inteligente, eu sou o melhor,
+        //  eu sou o mais lindo,
+        //  eu sou o mais gostoso, eu sou o mais perfeito, eu sou o mais maravilhoso,
+        //  eu sou o mais incrível,
+        //  eu sou o mais sensacional, eu sou o mais extraordinário, eu sou o mais espetacular, eu sou o mais fenomenal,
+        //  eu sou o mais fantástico, eu sou o mais maravilhoso, eu sou o mais incrível, eu sou o mais sensacional,
+        //  eu sou o mais extraordinário, eu sou o mais espetacular, eu sou o mais fenomenal, eu sou o mais fantástico
         if (!existeCadastro) {
             return id;
         }
@@ -42,7 +44,12 @@ server.post("/login-adm", async (req, res) => {
             if (!adm) {
                 res.status(401).json({ error: "Credenciais inválidas" });
             } else {
-                res.redirect("/pagina-inicial"); // redireciona para a página inicial
+                res.json({
+                    success: true,
+                    adm: {
+                        nome: adm.nome
+                    } // redireciona para a página inicial
+                });
             }
         })
         .catch((error) => {
@@ -58,19 +65,19 @@ server.get("/pagina-inicial", (req, res) => {
 /* -------------------------------rota cadastro usuario------------------------------- */
 server.post("/cadastro", async (req, res) => {
 
-   await Cadastro.create({
+    await Cadastro.create({
         id: await gerarId(),
         nome: req.body.nome,
         N_telefone: req.body.N_telefone
     })
-    
-    .then((cadastro) => {
-        res.json(cadastro);
-        console.log("Cadastro criado com sucesso:", cadastro);
-    }).catch((error) => {
-        console.error("Erro ao criar cadastro:", error);
-        res.status(500).json({ error: "Erro ao criar cadastro" });
-    });
+
+        .then((cadastro) => {
+            res.json(cadastro);
+            console.log("Cadastro criado com sucesso:", cadastro);
+        }).catch((error) => {
+            console.error("Erro ao criar cadastro:", error);
+            res.status(500).json({ error: "Erro ao criar cadastro" });
+        });
 });
 
 /* -------------------------------função para validar vencedor------------------------------- */
@@ -94,9 +101,9 @@ async function validarVencedor(jogoId, golsA, golsB) {
 /* -------------------------------rota criar palpite------------------------------- */
 server.post("/palpites", async (req, res) => {
     const vencedor = await validarVencedor(req.body.jogo_id,    //3 horas pra criar essa merda, quero que todo mundo vá pra casa do krai 
-                                           req.body.gols_palpite_a, 
-                                           req.body.gols_palpite_b);
-    
+        req.body.gols_palpite_a,
+        req.body.gols_palpite_b);
+
     await Palpites.create({
         usuario_id: req.body.usuario_id,
         jogo_id: req.body.jogo_id,
@@ -104,13 +111,13 @@ server.post("/palpites", async (req, res) => {
         gols_palpite_b: req.body.gols_palpite_b,
         selecao_vencedora_id: vencedor
     })
-    .then((palpite) => {
-        res.json(palpite);
-        console.log("Palpite criado com sucesso:", palpite);
-    }).catch((error) => {
-        console.error("Erro ao criar palpite:", error);
-        res.status(500).json({ error: "Erro ao criar palpite" });
-    });
+        .then((palpite) => {
+            res.json(palpite);
+            console.log("Palpite criado com sucesso:", palpite);
+        }).catch((error) => {
+            console.error("Erro ao criar palpite:", error);
+            res.status(500).json({ error: "Erro ao criar palpite" });
+        });
 });
 
 
@@ -190,6 +197,6 @@ server.post("/calcular-resultados", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`SERVER FUNCIONANDO NA PORTA ${PORT}`);
+    console.log(`SERVER FUNCIONANDO NA PORTA ${PORT}`);
 });
 
