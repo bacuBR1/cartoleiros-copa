@@ -11,7 +11,12 @@ const Resultado = require("./models/Resultado");
 const Ranking = require("./models/Ranking");
 
 Ranking.belongsTo(Cadastro, { foreignKey: "usuario_id" });
-
+Palpites.belongsTo(Selecao, {
+   foreignKey: "selecao_vencedora_id",
+   as: "vencedor"
+});
+Jogo.belongsTo(Selecao, { as: "selecao_a", foreignKey: "selecao_a_id" });
+Jogo.belongsTo(Selecao, { as: "selecao_b", foreignKey: "selecao_b_id" });
 Palpites.belongsTo(Jogo, { foreignKey: "jogo_id" });
 
 server.use(express.json());
@@ -122,7 +127,19 @@ server.delete("/delete-cadastro", async (req, res) => {
 //-------------------------------rota para mostrar palpites-------------------------------
 server.get("/mostrar-palpites", async (req, res) => {
     await Palpites.findAll({
-        include: [Jogo]
+        include: [
+            {
+                model: Jogo,
+                include: [
+                    { model: Selecao, as: "selecao_a" },
+                    { model: Selecao, as: "selecao_b" }
+                ]
+            },
+            {
+                model:Selecao,
+                as:"vencedor"
+            }
+        ]
     }).then((palpites) => {
         res.json(palpites);
     }).catch((error) => {

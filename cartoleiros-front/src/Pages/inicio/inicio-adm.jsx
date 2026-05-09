@@ -7,7 +7,7 @@ function InicioAdm() {
     }
 
     function cadastrarUsuarios() {
-        window.location.href = "/cadastro";
+        window.location.href = "/cadastro-users";
     }
 
     function removerUsuarios() {
