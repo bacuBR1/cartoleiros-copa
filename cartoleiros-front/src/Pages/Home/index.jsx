@@ -23,11 +23,13 @@ function Home() {
   }
 
   return (
-    <div className='home'>
-      <h1>Bem-vindo à Página Inicial</h1>
+    <section>
+      <div className='home'>
+        <h1>Bem-vindo à Página Inicial</h1>
 
-      <button onClick={buttonEnterLogin}>Entrar como ADM</button>
-    </div>
+        <button onClick={buttonEnterLogin}>Entrar como ADM</button>
+      </div>
+    </section>
   )
 }
 

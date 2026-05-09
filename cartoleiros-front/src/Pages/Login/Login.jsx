@@ -17,7 +17,7 @@ const inputSenha = useRef();
       });
       
       if (response.data.success) {
-        navigate("/pagina-inicial");
+        navigate("/inicio-adm");
       }
 
     } catch (error) {

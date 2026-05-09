@@ -1,4 +1,5 @@
 const express = require("express");
+const { Op } = require("sequelize");
 const cors = require("cors");
 const server = express();
 const Cadastro = require("./models/cadastro");
@@ -79,6 +80,86 @@ server.post("/cadastro", async (req, res) => {
             res.status(500).json({ error: "Erro ao criar cadastro" });
         });
 });
+
+server.get("/inicio-adm", async (req, res) => {
+    res.json({ message: "Bem-vindo, ADM!" });
+});
+
+//-------------------------------rota para visualizar cadastros-------------------------------
+server.get("/view-cadastro", async (req, res) => {
+    await Cadastro.findAll()
+        .then((cadastros) => {
+            res.json(cadastros);
+        })
+        .catch((error) => {
+            console.error("Erro ao buscar cadastros:", error);
+            res.status(500).json({ error: "Erro ao buscar cadastros" });
+        });
+});
+
+
+//-------------------------------rota para deletar cadastro-------------------------------
+server.delete("/delete-cadastro", async (req, res) => {
+    const { id, nome } = req.body;
+
+    await Cadastro.destroy({ where:
+                            {[Op.or]:[
+                                { id: id},
+                                {nome: nome }
+                                ]
+                            } 
+                        }).then((result) => {
+                            if (result === 0) {
+                                res.status(404).json({ error: "Cadastro não encontrado" });
+                            } else {
+                                res.json({ message: `Cadastro com id ${id} ou nome ${nome} deletado com sucesso` });
+                        }}).catch((error) => {
+                            console.error("Erro ao deletar cadastro:", error);
+                            res.status(500).json({ error: "Erro ao deletar cadastro" });
+                        });
+});
+
+//-------------------------------rota para mostrar palpites-------------------------------
+server.get("/mostrar-palpites", async (req, res) => {
+    await Palpites.findAll({
+        include: [Jogo]
+    }).then((palpites) => {
+        res.json(palpites);
+    }).catch((error) => {
+        console.error("Erro ao buscar palpites:", error);
+        res.status(500).json({ error: "Erro ao buscar palpites" });
+    });
+});
+
+/* -------------------------------rota para adcionar resultado------------------------------- */
+                                
+server.post("/adcionar-resultado", async (req, res) => {
+    const selecao = await Selecao.findOne({
+                where: {
+                    nome: req.body.nome_vencedor
+                }
+            });
+
+            if (!selecao) {
+                return res.status(404).json({
+                    error: "Seleção não encontrada"
+                });
+            }
+
+    await Resultado.create({
+        jogo_id: req.body.jogo_id,
+        selecao_vencedora_id: selecao.id,
+        gols_a: req.body.gols_a,
+        gols_b: req.body.gols_b
+    }).then((resultado) => {
+        res.json(resultado);
+        console.log("Resultado adicionado com sucesso:", resultado);
+    }).catch((error) => {
+        console.error("Erro ao adcionar resultado:", error);
+        res.status(500).json({ error: "Erro ao adcionar resultado" });
+    }); 
+});
+
 
 /* -------------------------------função para validar vencedor------------------------------- */
 
@@ -175,24 +256,26 @@ server.post("/calcular-resultados", async (req, res) => {
             order: [["total_pontos", "DESC"]]
         });
 
-        for (let i = 0; i < ranking.length; i++) {
-            await Ranking.update(
-                { posicao: i + 1 },
-                { where: { id: ranking[i].id } }
-            );
-        }
-
-        const rankingAtualizado = await Ranking.findAll({
-            include: [Cadastro],
-            order: [["total_pontos", "DESC"]]
-        });
-
-        res.json({ pontuacao, ranking: rankingAtualizado });
+        res.json(ranking);
 
     } catch (error) {
         console.error("Erro ao calcular pontuação:", error);
         res.status(500).json({ error: error.message });
     }
+});
+
+server.get("/mostrar-ranking", async (req, res) => {
+    await Ranking.findAll({
+        include: [Cadastro],
+        order: [["total_pontos", "DESC"]]
+    })
+        .then((ranking) => {
+            res.json(ranking);
+        })
+        .catch((error) => {
+            console.error("Erro ao mostrar ranking:", error);
+            res.status(500).json({ error: "Erro ao mostrar ranking" });
+        });
 });
 
 const PORT = process.env.PORT || 3000;
