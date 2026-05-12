@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate} from 'react-router-dom';
 import './LoginStyle.css'
 import api from '../../services/api'
@@ -8,6 +8,8 @@ function Login() {
 
 const inputNome = useRef();
 const inputSenha = useRef();
+
+const [mensagem, setMensagem] = useState([]);
 
   async function  postUsers() {
     try {
@@ -21,6 +23,7 @@ const inputSenha = useRef();
       }
 
     } catch (error) {
+      setMensagem("Erro ao realizar login. Por favor, tente novamente.");
       console.error("Erro ao realizar login:", error);
     }
   }
@@ -38,6 +41,7 @@ const inputSenha = useRef();
                 <input type="text" placeholder="Usuário" ref={inputNome} />
                 <input type="password" placeholder="Senha" ref={inputSenha} />
                 <button type="button" onClick={postUsers}>Entrar</button> 
+                <p>{mensagem}</p>
             </form>
     </div>
   </div>  

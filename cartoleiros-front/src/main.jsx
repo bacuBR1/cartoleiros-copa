@@ -10,6 +10,10 @@ import InicioAdm from "./Pages/inicio/inicio-adm";
 import ViewCadastro from "./Pages/view-usuario/view-cadastro";
 import CadastroUsers from "./Pages/cadastro-users/cadastro-users";
 import DeleteUsers from "./Pages/delete-users/delete-users";
+import ViewPalpites from "./Pages/view-palpite/view-palpites";
+import AdcionarResultados from "./Pages/adcionar-resultados/adcionar-resultados";
+import ViewResultados from "./Pages/view-resultados/view-resultados";
+import ViewRanking from "./Pages/view-ranking/view-ranking";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -22,6 +26,10 @@ createRoot(document.getElementById("root")).render(
         <Route path="/view-cadastro" element={<ViewCadastro />} />
         <Route path="/cadastro-users" element={<CadastroUsers />} />
         <Route path="/delete-cadastro" element={<DeleteUsers />} />
+        <Route path="/mostrar-palpites" element={<ViewPalpites />} />
+        <Route path="/adcionar-resultados" element={<AdcionarResultados />} />
+        <Route path="/mostrar-resultados" element={<ViewResultados />} />
+        <Route path="/mostrar-ranking" element={<ViewRanking />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>

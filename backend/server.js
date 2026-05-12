@@ -15,9 +15,13 @@ Palpites.belongsTo(Selecao, {
    foreignKey: "selecao_vencedora_id",
    as: "vencedor"
 });
+Palpites.belongsTo(Cadastro, { foreignKey: "usuario_id" });
 Jogo.belongsTo(Selecao, { as: "selecao_a", foreignKey: "selecao_a_id" });
 Jogo.belongsTo(Selecao, { as: "selecao_b", foreignKey: "selecao_b_id" });
 Palpites.belongsTo(Jogo, { foreignKey: "jogo_id" });
+Resultado.belongsTo(Jogo, { foreignKey: "jogo_id" });
+Resultado.belongsTo(Selecao, { foreignKey: "selecao_vencedora_id", as: "vencedor" });
+
 
 server.use(express.json());
 server.use(cors());
@@ -28,13 +32,6 @@ async function gerarId() {
         var id = Math.floor(Math.random() * 900) + 100;
 
         const existeCadastro = await Cadastro.findOne({ where: { id: id } }); //ta sendo uma luta existir um id que não existe, mas eu vou conseguir,
-        //  eu acredito em mim, eu sou capaz, eu sou forte, eu sou inteligente, eu sou o melhor,
-        //  eu sou o mais lindo,
-        //  eu sou o mais gostoso, eu sou o mais perfeito, eu sou o mais maravilhoso,
-        //  eu sou o mais incrível,
-        //  eu sou o mais sensacional, eu sou o mais extraordinário, eu sou o mais espetacular, eu sou o mais fenomenal,
-        //  eu sou o mais fantástico, eu sou o mais maravilhoso, eu sou o mais incrível, eu sou o mais sensacional,
-        //  eu sou o mais extraordinário, eu sou o mais espetacular, eu sou o mais fenomenal, eu sou o mais fantástico
         if (!existeCadastro) {
             return id;
         }
@@ -138,7 +135,8 @@ server.get("/mostrar-palpites", async (req, res) => {
             {
                 model:Selecao,
                 as:"vencedor"
-            }
+            },
+            { model: Cadastro }
         ]
     }).then((palpites) => {
         res.json(palpites);
@@ -151,21 +149,15 @@ server.get("/mostrar-palpites", async (req, res) => {
 /* -------------------------------rota para adcionar resultado------------------------------- */
                                 
 server.post("/adcionar-resultado", async (req, res) => {
-    const selecao = await Selecao.findOne({
-                where: {
-                    nome: req.body.nome_vencedor
-                }
-            });
 
-            if (!selecao) {
-                return res.status(404).json({
-                    error: "Seleção não encontrada"
-                });
-            }
+if (!req.body.jogo_id || req.body.gols_a === undefined || req.body.gols_b === undefined) {
+    return res.status(400).json({ error: "Dados incompletos" });
+}
 
+const vencedor = await validarVencedor(req.body.jogo_id, req.body.gols_a, req.body.gols_b);
     await Resultado.create({
         jogo_id: req.body.jogo_id,
-        selecao_vencedora_id: selecao.id,
+        selecao_vencedora_id: vencedor,
         gols_a: req.body.gols_a,
         gols_b: req.body.gols_b
     }).then((resultado) => {
@@ -176,6 +168,8 @@ server.post("/adcionar-resultado", async (req, res) => {
         res.status(500).json({ error: "Erro ao adcionar resultado" });
     }); 
 });
+
+
 
 
 /* -------------------------------função para validar vencedor------------------------------- */
@@ -216,6 +210,25 @@ server.post("/palpites", async (req, res) => {
             console.error("Erro ao criar palpite:", error);
             res.status(500).json({ error: "Erro ao criar palpite" });
         });
+});
+
+server.get("/mostrar-resultados", async (req, res) => {
+    await Resultado.findAll({
+        include: [
+            { model: Jogo,
+                include: [
+                    { model: Selecao, as: "selecao_a" },
+                    { model: Selecao, as: "selecao_b" }
+                ]
+            },
+            { model: Selecao, as: "vencedor" }
+        ]
+    }).then((resultados) => {
+        res.json(resultados);
+    }).catch((error) => {
+        console.error("Erro ao buscar resultados:", error);
+        res.status(500).json({ error: "Erro ao buscar resultados" });
+    });
 });
 
 

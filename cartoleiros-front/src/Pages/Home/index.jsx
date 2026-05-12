@@ -21,6 +21,10 @@ function Home() {
   function buttonEnterLogin() {
     window.location.href = "/login-adm";
   }
+  
+  function buttonEnterInicioUser() {
+    window.location.href = "/inicio-user";
+  }
 
   return (
     <section>
@@ -28,6 +32,7 @@ function Home() {
         <h1>Bem-vindo à Página Inicial</h1>
 
         <button onClick={buttonEnterLogin}>Entrar como ADM</button>
+        <button onClick={buttonEnterInicioUser}>Entrar como Usuário</button>
       </div>
     </section>
   )
