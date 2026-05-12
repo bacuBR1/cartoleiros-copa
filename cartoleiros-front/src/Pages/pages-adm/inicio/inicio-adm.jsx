@@ -1,6 +1,13 @@
 import './InicioStyle.css'
+import { useEffect } from 'react';
 
 function InicioAdm() {
+    useEffect(() => {
+        const adm = sessionStorage.getItem("adm");
+        if (!adm) {
+            window.location.href = "/login-adm";
+        }
+    }, []);
 
     function buttonGerenciarUsuarios() {
         window.location.href = "/view-cadastro";

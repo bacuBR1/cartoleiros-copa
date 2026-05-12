@@ -1,10 +1,16 @@
-import api from "../../services/api";
+import api from "../../../services/api";
 import { useEffect, useState } from "react";
 
 function ViewPalpites() {
     const [palpites, setPalpites] = useState([]);
 
     useEffect(() => {
+        
+            const adm = sessionStorage.getItem("adm");
+            if (!adm) {
+                window.location.href = "/login-adm";
+            }
+       
         async function getPalpites() {
             try {
                 const response = await api.get("/mostrar-palpites");

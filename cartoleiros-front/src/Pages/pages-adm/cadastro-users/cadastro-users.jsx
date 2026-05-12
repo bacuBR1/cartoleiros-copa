@@ -1,8 +1,15 @@
-import api from "../../services/api";
-import { useRef, useState } from "react";
+import api from "../../../services/api";
+import { useRef, useState, useEffect } from "react";
 import "./cadastroStyle.css"; 
 
 function CadastroUsers() {
+    useEffect(() => {
+        const adm = sessionStorage.getItem("adm");
+        if (!adm) {
+            window.location.href = "/login-adm";
+        }
+    }, []);
+    
     const [mensagem, setMensagem] = useState("");
     const inputNome = useRef();
     const inputTelefone = useRef();

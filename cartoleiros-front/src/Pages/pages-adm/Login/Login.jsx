@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate} from 'react-router-dom';
 import './LoginStyle.css'
-import api from '../../services/api'
+import api from '../../../services/api'
 
 function Login() {
   const navigate = useNavigate();
@@ -19,7 +19,10 @@ const [mensagem, setMensagem] = useState([]);
       });
       
       if (response.data.success) {
-        navigate("/inicio-adm");
+        if (response.data.success) {
+          sessionStorage.setItem("adm", response.data.adm.nome);
+           navigate("/inicio-adm");
+        }
       }
 
     } catch (error) {

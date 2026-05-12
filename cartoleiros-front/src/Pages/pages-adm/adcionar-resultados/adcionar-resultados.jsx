@@ -1,8 +1,14 @@
-import api from "../../services/api";
-import { useRef, useState } from "react";
+import api from "../../../services/api";
+import { useRef, useState, useEffect } from "react";
 import "./resultadosStyle.css";
 
 function AdcionarResultados() {
+    useEffect(() => {
+        const adm = sessionStorage.getItem("adm");
+        if (!adm) {
+            window.location.href = "/login-adm";
+        }
+    }, []);
     const jogo_id = useRef();
     const gols_a = useRef();
     const gols_b = useRef();

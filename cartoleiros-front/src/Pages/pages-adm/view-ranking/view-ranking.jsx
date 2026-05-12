@@ -1,4 +1,4 @@
-import api from "../../services/api";
+import api from "../../../services/api";
 import { useEffect, useState } from "react";
 import "./ranking.css";
 
@@ -15,6 +15,12 @@ function ViewRanking() {
         }
     }
     useEffect(() => {
+        
+            const adm = sessionStorage.getItem("adm");
+            if (!adm) {
+                window.location.href = "/login-adm";
+            }
+
         mostrarRanking();
     }, []);
     return (

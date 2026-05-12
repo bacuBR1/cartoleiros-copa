@@ -1,4 +1,4 @@
-import api from "../../services/api";
+import api from "../../../services/api";
 import { useEffect } from "react";
 import "./view-cadastroStyle.css";
 import { useState } from "react";
@@ -8,6 +8,10 @@ function ViewCadastro() {
 const [usuarios, setUsuarios] = useState([]);
 
     useEffect(() => {
+            const adm = sessionStorage.getItem("adm");
+            if (!adm) {
+                window.location.href = "/login-adm";
+            }
         async function getUsers() {
             try {
                 const response = await api.get('/view-cadastro');

@@ -1,4 +1,4 @@
-import api from "../../services/api";
+import api from "../../../services/api";
 import { useEffect, useState } from "react";
 import "./view-resultados.css";
 
@@ -24,6 +24,12 @@ const [resultados, setResultados] = useState([]);
         }
     }
     useEffect(() => {
+
+            const adm = sessionStorage.getItem("adm");
+            if (!adm) {
+                window.location.href = "/login-adm";
+            }
+        
         mostrarResultados();
     }, []);
 
